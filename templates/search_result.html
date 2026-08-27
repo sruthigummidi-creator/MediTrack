@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }} | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item active"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Patients / Search Result</p>
+<h1>{{ title }}</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<div class="result-wrapper">
+
+{% if patient %}
+
+<section class="patient-result-card">
+<div class="result-success-icon">✓</div>
+<h2>Patient Found</h2>
+<p class="result-subtitle">Patient record has been found successfully.</p>
+
+<div class="result-details">
+<div class="result-detail">
+<span>PATIENT ID</span>
+<strong>{{ patient.patient_id }}</strong>
+</div>
+<div class="result-detail">
+<span>FULL NAME</span>
+<strong>{{ patient.name }}</strong>
+</div>
+<div class="result-detail">
+<span>AGE</span>
+<strong>{{ patient.age }}</strong>
+</div>
+<div class="result-detail">
+<span>GENDER</span>
+<strong>{{ patient.gender }}</strong>
+</div>
+<div class="result-detail">
+<span>PHONE</span>
+<strong>{{ patient.phone }}</strong>
+</div>
+<div class="result-detail">
+<span>BLOOD GROUP</span>
+<strong class="result-blood">{{ patient.blood }}</strong>
+</div>
+</div>
+
+<div class="result-actions">
+<a href="/search" class="result-secondary">Search Another</a>
+<a href="/patients" class="result-primary">View All Patients</a>
+</div>
+</section>
+
+{% else %}
+
+<section class="patient-result-card not-found-card">
+<div class="result-error-icon">×</div>
+<h2>Patient Not Found</h2>
+<p class="result-subtitle">No patient record was found with the entered Patient ID.</p>
+
+<div class="not-found-message">
+<p>Please check the Patient ID and try searching again.</p>
+</div>
+
+<div class="result-actions">
+<a href="/search" class="result-primary">Try Again</a>
+<a href="/" class="result-secondary">Back to MediTrack</a>
+</div>
+</section>
+
+{% endif %}
+
+</div>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

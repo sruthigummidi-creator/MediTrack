@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }} | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item active"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Patients / Update Result</p>
+<h1>{{ title }}</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<div class="action-result-wrapper">
+<section class="action-result-card">
+{% if success %}
+<div class="action-success-icon">✓</div>
+{% else %}
+<div class="action-error-icon">×</div>
+{% endif %}
+
+<h2>{{ title }}</h2>
+<p>{{ message }}</p>
+
+<div class="action-result-buttons">
+<a href="{{ primary_link }}" class="action-primary">{{ primary_text }}</a>
+<a href="{{ secondary_link }}" class="action-secondary">{{ secondary_text }}</a>
+</div>
+</section>
+</div>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

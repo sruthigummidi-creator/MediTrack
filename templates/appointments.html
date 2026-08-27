@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointments | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item active"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Appointments / View Appointments</p>
+<h1>Appointments</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<section class="page-intro">
+<span class="section-label">APPOINTMENT MANAGEMENT</span>
+<h2>Scheduled Appointments</h2>
+<p>View all appointments currently scheduled in MediTrack.</p>
+</section>
+
+{% if appointment_list %}
+<div class="appointments-grid">
+{% for appointment in appointment_list %}
+<div class="appointment-view-card">
+<div class="appointment-view-header">
+<div class="appointment-view-icon">▣</div>
+<div>
+<h3>Appointment</h3>
+<span>Patient ID: {{ appointment.patient_id }}</span>
+</div>
+</div>
+<div class="appointment-details">
+<div class="appointment-detail">
+<span>DOCTOR</span>
+<strong>{{ appointment.doctor }}</strong>
+</div>
+<div class="appointment-detail">
+<span>DATE</span>
+<strong>{{ appointment.date }}</strong>
+</div>
+<div class="appointment-detail">
+<span>TIME</span>
+<strong>{{ appointment.time }}</strong>
+</div>
+</div>
+<div class="appointment-status">
+<span>✓ Scheduled</span>
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+<div class="empty-icon">▣</div>
+<h2>No Appointments</h2>
+<p>There are currently no appointments scheduled.</p>
+<a href="/book-appointment" class="primary-btn">+ Book Appointment</a>
+</div>
+{% endif %}
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

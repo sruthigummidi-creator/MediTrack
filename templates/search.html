@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Patient | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item active"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Patients / Search</p>
+<h1>Search Patient</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<section class="page-intro">
+<span class="section-label">PATIENT MANAGEMENT</span>
+<h2>Find a Patient</h2>
+<p>Search for an existing patient using their unique Patient ID.</p>
+</section>
+
+<section class="search-card">
+<div class="search-header">
+<div class="search-icon-large">⌕</div>
+<div>
+<h2>Patient Search</h2>
+<p>Enter the Patient ID to find the patient's record.</p>
+</div>
+</div>
+
+<form action="/search-result" method="post" class="search-form">
+<div class="search-field">
+<label for="patient_id">Patient ID</label>
+<input type="text" id="patient_id" name="patient_id" placeholder="Example: PAT200" required>
+<small>Enter the exact Patient ID registered in MediTrack.</small>
+</div>
+<button type="submit" class="search-btn">⌕ Search Patient</button>
+</form>
+</section>
+
+<section class="search-help">
+<div class="help-icon">i</div>
+<div>
+<h3>Looking for a patient?</h3>
+<p>Use the Patient ID assigned during registration. You can find registered patients from the View Patients page.</p>
+<a href="/patients">View All Patients →</a>
+</div>
+</section>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

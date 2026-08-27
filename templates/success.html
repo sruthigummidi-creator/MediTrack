@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Success | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Patients / Registration</p>
+<h1>Registration Complete</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<div class="success-wrapper">
+<div class="success-card">
+<div class="success-icon">{{ icon }}</div>
+<h2>{{ title }}</h2>
+<p>{{ message }}</p>
+<div class="success-actions">
+<a href="/patients" class="success-primary">View Patients</a>
+<a href="/register" class="success-secondary">Register Another</a>
+</div>
+</div>
+</div>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

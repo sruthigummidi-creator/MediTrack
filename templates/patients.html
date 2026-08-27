@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patients | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+
+<div class="nav-title">PATIENTS</div>
+
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item active"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+
+<div class="nav-title">APPOINTMENTS</div>
+
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+
+<header class="topbar">
+<div>
+<p class="breadcrumb">Patients / View Patients</p>
+<h1>Registered Patients</h1>
+</div>
+
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<section class="page-intro">
+<span class="section-label">PATIENT MANAGEMENT</span>
+<h2>Patient Records</h2>
+<p>View all patients currently registered in MediTrack.</p>
+</section>
+
+{% if patient_list %}
+
+<div class="patients-grid">
+
+{% for patient in patient_list %}
+
+<div class="patient-card">
+
+<div class="patient-card-header">
+<div class="patient-avatar">♙</div>
+<div>
+<h3>{{ patient.name }}</h3>
+<span>Patient ID: {{ patient.patient_id }}</span>
+</div>
+</div>
+
+<div class="patient-details">
+
+<div class="patient-detail">
+<span>AGE</span>
+<strong>{{ patient.age }}</strong>
+</div>
+
+<div class="patient-detail">
+<span>GENDER</span>
+<strong>{{ patient.gender }}</strong>
+</div>
+
+<div class="patient-detail">
+<span>PHONE</span>
+<strong>{{ patient.phone }}</strong>
+</div>
+
+<div class="patient-detail">
+<span>BLOOD GROUP</span>
+<strong class="blood-badge">{{ patient.blood }}</strong>
+</div>
+
+</div>
+
+<div class="patient-card-footer">
+<span>✓ Registered Patient</span>
+<a href="/search">View Details →</a>
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="empty-state">
+<div class="empty-icon">♙</div>
+<h2>No Patients Registered</h2>
+<p>There are currently no patients in the MediTrack database.</p>
+<a href="/register" class="primary-btn">+ Register Patient</a>
+</div>
+
+{% endif %}
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancel Appointment | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item active danger-link"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Appointments / Cancel</p>
+<h1>Cancel Appointment</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<section class="page-intro">
+<span class="section-label">APPOINTMENT MANAGEMENT</span>
+<h2>Cancel Appointment</h2>
+<p>Remove an existing appointment using the patient's ID.</p>
+</section>
+
+<section class="cancel-card">
+<div class="cancel-header">
+<div class="cancel-icon">×</div>
+<div>
+<h2>Cancel Scheduled Appointment</h2>
+<p>Enter the Patient ID associated with the appointment.</p>
+</div>
+</div>
+
+<div class="cancel-warning">
+<div class="cancel-warning-icon">!</div>
+<div>
+<strong>Important</strong>
+<p>Make sure the Patient ID is correct before cancelling the appointment.</p>
+</div>
+</div>
+
+<form action="/cancel-appointment" method="post">
+<div class="cancel-group">
+<label for="patient_id">Patient ID</label>
+<input type="text" id="patient_id" name="patient_id" placeholder="Example: PAT101" required>
+<small>Enter the Patient ID whose appointment should be cancelled.</small>
+</div>
+
+<div class="cancel-footer">
+<a href="/" class="cancel-back">Cancel</a>
+<button type="submit" class="cancel-appointment-btn">× Cancel Appointment</button>
+</div>
+</form>
+</section>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

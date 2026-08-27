@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack | Healthcare Management</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">✚</div>
+            <div>
+                <h2>MediTrack</h2>
+                <span>Healthcare System</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/" class="nav-item active">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <div class="nav-title">PATIENTS</div>
+
+            <a href="/register" class="nav-item">
+                <span>＋</span>
+                Register Patient
+            </a>
+
+            <a href="/patients" class="nav-item">
+                <span>♙</span>
+                View Patients
+            </a>
+
+            <a href="/search" class="nav-item">
+                <span>⌕</span>
+                Search Patient
+            </a>
+
+            <a href="/update" class="nav-item">
+                <span>✎</span>
+                Update Patient
+            </a>
+
+            <a href="/delete" class="nav-item danger-link">
+                <span>⌫</span>
+                Delete Patient
+            </a>
+
+            <div class="nav-title">APPOINTMENTS</div>
+
+            <a href="/book-appointment" class="nav-item">
+                <span>＋</span>
+                Book Appointment
+            </a>
+
+            <a href="/appointments" class="nav-item">
+                <span>▣</span>
+                View Appointments
+            </a>
+
+            <a href="/cancel-appointment" class="nav-item">
+                <span>×</span>
+                Cancel Appointment
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="footer-icon">♥</div>
+            <div>
+                <strong>MediTrack</strong>
+                <small>Care made simpler</small>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Top Header -->
+        <header class="topbar">
+
+            <div>
+                <p class="breadcrumb">Home / Dashboard</p>
+                <h1>Dashboard</h1>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">M</div>
+                <div>
+                    <strong>MediTrack Admin</strong>
+                    <span>Administrator</span>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- Welcome Section -->
+        <section class="welcome-card">
+
+            <div class="welcome-content">
+
+                <span class="welcome-label">WELCOME BACK</span>
+
+                <h2>Healthcare management made simple.</h2>
+
+                <p>
+                    Manage patients, appointments and medical records
+                    efficiently from one place.
+                </p>
+
+                <div class="welcome-buttons">
+                    <a href="/register" class="primary-btn">
+                        + Register Patient
+                    </a>
+
+                    <a href="/book-appointment" class="secondary-btn">
+                        Book Appointment
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="welcome-icon">
+                <div class="medical-cross">✚</div>
+            </div>
+
+        </section>
+
+
+        <!-- Statistics -->
+        <section class="section-heading">
+            <div>
+                <span class="section-label">OVERVIEW</span>
+                <h2>Quick Statistics</h2>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon patients-icon">
+                    ♙
+                </div>
+
+                <div class="stat-info">
+                    <span>Total Patients</span>
+                    <h3>{{ total_patients }}</h3>
+                    <a href="/patients">View patients →</a>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon appointment-icon">
+                    ▣
+                </div>
+
+                <div class="stat-info">
+                    <span>Appointments</span>
+                    <h3>{{ total_appointments }}</h3>
+                    <a href="/appointments">View appointments →</a>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon search-icon">
+                    ⌕
+                </div>
+
+                <div class="stat-info">
+                    <span>Patient Search</span>
+                    <h3>Find Patient</h3>
+                    <a href="/search">Search now →</a>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Quick Actions -->
+        <section class="section-heading actions-heading">
+
+            <div>
+                <span class="section-label">ACTIONS</span>
+                <h2>Quick Actions</h2>
+            </div>
+
+        </section>
+
+
+        <section class="actions-grid">
+            <a href="/consultation" class="action-card">
+
+                <div class="action-icon yellow">
+                    +
+                </div>
+
+                <div>
+                    <h3>Start Consultation</h3>
+                    <p>Record patient consultation details</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+            <a href="/consultations" class="action-card">
+
+                <div class="action-icon yellow">
+                    ▣
+                </div>
+
+                <div>
+                    <h3>Consultation History</h3>
+                    <p>View previous consultation records</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+            <a href="/prescription" class="action-card">
+
+                <div class="action-icon yellow">
+                    +
+                </div>
+
+                <div>
+                    <h3>Generate Prescription</h3>
+                    <p>Create a patient prescription</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+            <a href="/prescriptions" class="action-card">
+
+                <div class="action-icon yellow">
+                    ▣
+                </div>
+
+                <div>
+                    <h3>View Prescriptions</h3>
+                    <p>View patient prescriptions</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+            <a href="/register" class="action-card">
+
+                <div class="action-icon blue">
+                    +
+                </div>
+
+                <div>
+                    <h3>Register Patient</h3>
+                    <p>Add a new patient to MediTrack</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+
+            <a href="/book-appointment" class="action-card">
+
+                <div class="action-icon green">
+                    ▣
+                </div>
+
+                <div>
+                    <h3>Book Appointment</h3>
+                    <p>Schedule a patient appointment</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+
+            <a href="/search" class="action-card">
+
+                <div class="action-icon purple">
+                    ⌕
+                </div>
+
+                <div>
+                    <h3>Search Patient</h3>
+                    <p>Find patient records quickly</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+
+            <a href="/dashboard" class="action-card">
+
+                <div class="action-icon orange">
+                    ▦
+                </div>
+
+                <div>
+                    <h3>View Dashboard</h3>
+                    <p>See system statistics</p>
+                </div>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+        </section>
+
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <p>© 2026 MediTrack · Healthcare Management System</p>
+            <p>Patient care made simpler.</p>
+        </footer>
+
+    </main>
+
+</body>
+
+</html>

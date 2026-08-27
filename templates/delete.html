@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delete Patient | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item active danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Patients / Delete</p>
+<h1>Delete Patient</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<section class="page-intro">
+<span class="section-label">PATIENT MANAGEMENT</span>
+<h2>Remove Patient Record</h2>
+<p>Delete an existing patient record from the MediTrack database.</p>
+</section>
+
+<section class="delete-card">
+<div class="delete-header">
+<div class="delete-icon">⌫</div>
+<div>
+<h2>Delete Patient Record</h2>
+<p>Enter the Patient ID of the record you want to remove.</p>
+</div>
+</div>
+
+<div class="warning-box">
+<div class="warning-icon">!</div>
+<div>
+<strong>Important</strong>
+<p>This action will permanently remove the patient record from the database.</p>
+</div>
+</div>
+
+<form action="/delete" method="post">
+<div class="delete-group">
+<label for="patient_id">Patient ID</label>
+<input type="text" id="patient_id" name="patient_id" placeholder="Example: PAT101" required>
+<small>Make sure the Patient ID is correct before deleting.</small>
+</div>
+
+<div class="delete-footer">
+<a href="/" class="delete-cancel">Cancel</a>
+<button type="submit" class="delete-btn">⌫ Delete Patient</button>
+</div>
+</form>
+</section>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

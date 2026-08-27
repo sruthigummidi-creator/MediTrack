@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Appointment | MediTrack</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-icon">✚</div>
+<div>
+<h2>MediTrack</h2>
+<span>Healthcare System</span>
+</div>
+</div>
+<nav class="sidebar-nav">
+<a href="/" class="nav-item"><span>⌂</span>Dashboard</a>
+<div class="nav-title">PATIENTS</div>
+<a href="/register" class="nav-item"><span>＋</span>Register Patient</a>
+<a href="/patients" class="nav-item"><span>♙</span>View Patients</a>
+<a href="/search" class="nav-item"><span>⌕</span>Search Patient</a>
+<a href="/update" class="nav-item"><span>✎</span>Update Patient</a>
+<a href="/delete" class="nav-item danger-link"><span>⌫</span>Delete Patient</a>
+<div class="nav-title">APPOINTMENTS</div>
+<a href="/book-appointment" class="nav-item active"><span>＋</span>Book Appointment</a>
+<a href="/appointments" class="nav-item"><span>▣</span>View Appointments</a>
+<a href="/cancel-appointment" class="nav-item"><span>×</span>Cancel Appointment</a>
+</nav>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Appointments / Book</p>
+<h1>Book Appointment</h1>
+</div>
+<div class="profile">
+<div class="profile-avatar">M</div>
+<div>
+<strong>MediTrack Admin</strong>
+<span>Administrator</span>
+</div>
+</div>
+</header>
+
+<section class="page-intro">
+<span class="section-label">APPOINTMENT MANAGEMENT</span>
+<h2>Schedule a New Appointment</h2>
+<p>Enter the patient and appointment details below.</p>
+</section>
+
+<section class="appointment-card">
+<div class="appointment-header">
+<div class="appointment-icon">▣</div>
+<div>
+<h2>Appointment Information</h2>
+<p>Provide accurate details to schedule the appointment.</p>
+</div>
+</div>
+
+<form action="/book-appointment" method="post">
+<div class="appointment-grid">
+<div class="appointment-group">
+<label for="patient_id">Patient ID</label>
+<input type="text" id="patient_id" name="patient_id" placeholder="Example: PAT101" required>
+</div>
+
+<div class="appointment-group">
+<label for="doctor">Doctor</label>
+<input type="text" id="doctor" name="doctor" placeholder="Enter doctor's name" required>
+</div>
+
+<div class="appointment-group">
+<label for="date">Date</label>
+<input type="date" id="date" name="date" required>
+</div>
+
+<div class="appointment-group">
+<label for="time">Time</label>
+<input type="time" id="time" name="time" required>
+</div>
+</div>
+
+<div class="appointment-footer">
+<a href="/" class="appointment-cancel">Cancel</a>
+<button type="submit" class="appointment-btn">▣ Book Appointment</button>
+</div>
+</form>
+</section>
+
+<footer class="main-footer">
+<p>© 2026 MediTrack · Healthcare Management System</p>
+<p>Patient care made simpler.</p>
+</footer>
+</main>
+</body>
+</html>

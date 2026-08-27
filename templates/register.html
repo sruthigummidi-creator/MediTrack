@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Patient | MediTrack</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">✚</div>
+
+            <div>
+                <h2>MediTrack</h2>
+                <span>Healthcare System</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/" class="nav-item">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <div class="nav-title">PATIENTS</div>
+
+            <a href="/register" class="nav-item active">
+                <span>＋</span>
+                Register Patient
+            </a>
+
+            <a href="/patients" class="nav-item">
+                <span>♙</span>
+                View Patients
+            </a>
+
+            <a href="/search" class="nav-item">
+                <span>⌕</span>
+                Search Patient
+            </a>
+
+            <a href="/update" class="nav-item">
+                <span>✎</span>
+                Update Patient
+            </a>
+
+            <a href="/delete" class="nav-item danger-link">
+                <span>⌫</span>
+                Delete Patient
+            </a>
+
+            <div class="nav-title">APPOINTMENTS</div>
+
+            <a href="/book-appointment" class="nav-item">
+                <span>＋</span>
+                Book Appointment
+            </a>
+
+            <a href="/appointments" class="nav-item">
+                <span>▣</span>
+                View Appointments
+            </a>
+
+            <a href="/cancel-appointment" class="nav-item">
+                <span>×</span>
+                Cancel Appointment
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <p class="breadcrumb">Patients / Register</p>
+                <h1>Register Patient</h1>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">M</div>
+
+                <div>
+                    <strong>MediTrack Admin</strong>
+                    <span>Administrator</span>
+                </div>
+            </div>
+
+        </header>
+
+
+        <section class="page-intro">
+
+            <div>
+                <span class="section-label">PATIENT MANAGEMENT</span>
+
+                <h2>Add New Patient</h2>
+
+                <p>
+                    Enter the patient's information below to create
+                    a new patient record.
+                </p>
+            </div>
+
+        </section>
+
+
+        <section class="form-card">
+
+            <div class="form-header">
+
+                <div class="form-icon">
+                    ♙
+                </div>
+
+                <div>
+                    <h2>Patient Information</h2>
+
+                    <p>
+                        Please provide accurate patient details.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form action="/register" method="post">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="patient_id">
+                            Patient ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="patient_id"
+                            name="patient_id"
+                            placeholder="Example: PAT101"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="name">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Enter patient's full name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="age">
+                            Age
+                        </label>
+
+                        <input
+                            type="number"
+                            id="age"
+                            name="age"
+                            placeholder="Enter age"
+                            min="1"
+                            max="120"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="gender">
+                            Gender
+                        </label>
+
+                        <select
+                            id="gender"
+                            name="gender"
+                            required
+                        >
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Enter phone number"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="blood">
+                            Blood Group
+                        </label>
+
+                        <select
+                            id="blood"
+                            name="blood"
+                            required
+                        >
+                            <option value="">Select blood group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-footer">
+
+                    <a href="/" class="cancel-btn">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="submit-btn">
+                        Register Patient
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <footer class="main-footer">
+            <p>© 2026 MediTrack · Healthcare Management System</p>
+            <p>Patient care made simpler.</p>
+        </footer>
+
+    </main>
+
+</body>
+</html>
