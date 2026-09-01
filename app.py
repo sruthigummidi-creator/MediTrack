@@ -1,37 +1,1156 @@
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+import os
+from jose import jwt
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from database import engine, Base
 from database import SessionLocal
 import models
+from datetime import datetime
 
-
+SECRET_KEY = "meditrack-secret-key-2026"
+ALGORITHM = "HS256"
 app = FastAPI()
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+        return payload
+    except Exception:
+        return None
+def create_audit_log(db, username, action, details):
+    log = models.AuditLog(
+        username=username,
+        action=action,
+        details=details,
+        timestamp=datetime.now()
+    )
+
+    db.add(log)
+    db.commit()
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SESSION_SECRET", "meditrack-milestone2-secret")
+)
 
 templates = Jinja2Templates(directory="templates")
 
 app.mount("/static", StaticFiles(directory="templates"), name="static")
 
 Base.metadata.create_all(bind=engine)
-@app.get("/", response_class=HTMLResponse)
-def home(request: Request):
+def create_default_users():
     db = SessionLocal()
-    total_patients = db.query(models.Patient).count()
-    total_appointments = db.query(models.Appointment).count()
+
+    if not db.query(models.User).filter(
+        models.User.username == "doctor"
+    ).first():
+        db.add(models.User(
+            username="doctor",
+            password="doctor123",
+            role="doctor"
+        ))
+
+    if not db.query(models.User).filter(
+        models.User.username == "patient"
+    ).first():
+        db.add(models.User(
+            username="patient",
+            password="patient123",
+            role="patient"
+        ))
+
+    db.commit()
     db.close()
 
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "request": request,
-            "total_patients": total_patients,
-            "total_appointments": total_appointments
-        }
+
+create_default_users()
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>MediTrack Login</title>
+        <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background: #06172D;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 430px;
+        background: #102F50;
+        border: 1px solid #315878;
+        border-radius: 18px;
+        padding: 40px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .label {
+        color: #F4C542;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+    }
+
+    .subtitle {
+        color: #AFC1D2;
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #DDE7F1;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 13px;
+        border-radius: 8px;
+        border: 1px solid #315878;
+        background: #081D35;
+        color: white;
+        font-size: 14px;
+        outline: none;
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #F4C542;
+    }
+
+    select option {
+        background: #081D35;
+        color: white;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 9px;
+        background: #F4C542;
+        color: #06172D;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .logo {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        background: #F4C542;
+        color: #06172D;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+</style>
+    </head>
+
+    <body>
+<body>
+
+    <div class="login-container">
+
+        <div class="logo">+</div>
+
+        <div class="label">MEDITRACK</div>
+
+        <h1>Welcome Back</h1>
+
+        <p class="subtitle">
+            Login to access your healthcare portal.
+        </p>
+
+        <form action="/login" method="post">
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
+                </select>
+            </div>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+    </div>
+
+</body>
+    </body>
+    </html>
+    """
+@app.post("/login", response_class=HTMLResponse)
+def login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    role: str = Form(...)
+):
+    db = SessionLocal()
+
+    user = db.query(models.User).filter(
+        models.User.username == username,
+        models.User.password == password,
+        models.User.role == role
+    ).first()
+
+    db.close()
+
+    if not user:
+        audit_db = SessionLocal()
+
+        create_audit_log(
+            audit_db,
+            username,
+            "FAILED_LOGIN",
+            f"Failed login attempt with role {role}"
+        )
+
+        audit_db.close()
+        return HTMLResponse(
+           
+        """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Invalid Login - MediTrack</title>
+
+            <style>
+                * {
+                    box-sizing: border-box;
+                }
+
+                body {
+                    margin: 0;
+                    min-height: 100vh;
+                    font-family: Arial, sans-serif;
+                    background: #06172D;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .error-card {
+                    width: 100%;
+                    max-width: 430px;
+                    background: #102F50;
+                    border: 1px solid #315878;
+                    border-radius: 18px;
+                    padding: 40px;
+                    text-align: center;
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+                }
+
+                .error-icon {
+                    width: 65px;
+                    height: 65px;
+                    margin: 0 auto 20px;
+                    border-radius: 50%;
+                    background: #F4C542;
+                    color: #06172D;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 30px;
+                    font-weight: bold;
+                }
+
+                .label {
+                    color: #F4C542;
+                    font-size: 12px;
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                }
+
+                h2 {
+                    font-size: 28px;
+                    margin: 12px 0;
+                }
+
+                p {
+                    color: #AFC1D2;
+                    font-size: 14px;
+                    line-height: 1.6;
+                }
+
+                .try-again {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 13px 25px;
+                    background: #F4C542;
+                    color: #06172D;
+                    border-radius: 9px;
+                    text-decoration: none;
+                    font-weight: bold;
+                }
+
+                .try-again:hover {
+                    opacity: 0.9;
+                }
+            </style>
+        </head>
+
+        <body>
+
+            <div class="error-card">
+
+                <div class="error-icon">!</div>
+
+                <div class="label">MEDITRACK LOGIN</div>
+
+                <h2>Invalid Login</h2>
+
+                <p>
+                    Username, password, or role is incorrect.
+                    Please check your login details and try again.
+                </p>
+
+                <a href="/login" class="try-again">
+                    Try Again
+                </a>
+
+            </div>
+
+        </body>
+        </html>
+        """
+    )
+    request.session["username"] = user.username
+    request.session["role"] = user.role
+    request.session["patient_id"] = user.patient_id
+    audit_db = SessionLocal()
+
+    create_audit_log(
+        audit_db,
+        user.username,
+        "LOGIN",
+        f"Successful login as {user.role}"
     )
 
+    audit_db.close()
+    token_data = {
+    "username": user.username,
+    "role": user.role,
+    "patient_id": user.patient_id
+    }
+
+    token = jwt.encode(
+        token_data,
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+
+    request.session["access_token"] = token
+    
+
+    if user.role == "patient":
+        return RedirectResponse("/patient-dashboard", status_code=303)
+
+    if user.role == "doctor":
+        return RedirectResponse("/doctor-dashboard", status_code=303)
+
+    return RedirectResponse("/dashboard", status_code=303)
+@app.get("/patient-dashboard", response_class=HTMLResponse)
+def patient_dashboard(request: Request):
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "patient":
+        return RedirectResponse("/login", status_code=303)
+
+    if request.session.get("role") != "patient":
+        return RedirectResponse("/login", status_code=303)
+
+    db = SessionLocal()
+
+    patient_id = request.session.get("patient_id")
+
+    notifications = db.query(models.Notification).filter(
+        models.Notification.patient_id == patient_id
+    ).all()
+
+    db.close()
+
+    notification_html = ""
+
+    for notification in notifications:
+        notification_html += f"""
+        <div class="notification-item">
+            <div class="notification-icon">🔔</div>
+
+            <div>
+                <h3>{notification.notification_type}</h3>
+                <p>{notification.message}</p>
+            </div>
+        </div>
+        """
+
+    if not notification_html:
+        notification_html = """
+        <div class="notification-item">
+            <div class="notification-icon">✓</div>
+
+            <div>
+                <h3>No Notifications</h3>
+                <p>You don't have any notifications yet.</p>
+            </div>
+        </div>
+        """
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+        <title>Patient Dashboard - MediTrack</title>
+
+        <style>
+
+            * {{
+                box-sizing: border-box;
+            }}
+
+            body {{
+                margin: 0;
+                min-height: 100vh;
+                font-family: Arial, sans-serif;
+                background: #06172D;
+                color: white;
+            }}
+
+            .container {{
+                max-width: 1100px;
+                margin: auto;
+                padding: 50px 30px;
+            }}
+
+            .header {{
+                background: #12385D;
+                padding: 40px;
+                border-radius: 18px;
+                margin-bottom: 30px;
+                border: 1px solid #315878;
+            }}
+
+            .label {{
+                color: #F4C542;
+                font-size: 13px;
+                font-weight: bold;
+                letter-spacing: 2px;
+            }}
+
+            .header h1 {{
+                font-size: 38px;
+                margin: 12px 0;
+            }}
+
+            .header p {{
+                color: #C4D2DF;
+                font-size: 16px;
+            }}
+
+            .section-title {{
+                margin: 30px 0 18px;
+                color: #F4C542;
+                font-size: 13px;
+                font-weight: bold;
+                letter-spacing: 2px;
+            }}
+
+            .notification-card {{
+                background: #102F50;
+                border: 1px solid #315878;
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 30px;
+            }}
+
+            .notification-item {{
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 15px;
+                background: #081D35;
+                border-radius: 10px;
+                margin-bottom: 10px;
+            }}
+
+            .notification-icon {{
+                width: 45px;
+                height: 45px;
+                border-radius: 10px;
+                background: #29475D;
+                color: #F4C542;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                flex-shrink: 0;
+            }}
+
+            .notification-item h3 {{
+                margin: 0 0 5px;
+                color: #F4C542;
+                font-size: 14px;
+            }}
+
+            .notification-item p {{
+                margin: 0;
+                color: #C4D2DF;
+                font-size: 13px;
+            }}
+
+            .cards {{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }}
+
+            .card {{
+                background: #102F50;
+                border: 1px solid #315878;
+                border-radius: 16px;
+                padding: 28px;
+                text-decoration: none;
+                color: white;
+                transition: 0.2s;
+            }}
+
+            .card:hover {{
+                transform: translateY(-5px);
+                border-color: #F4C542;
+            }}
+
+            .icon {{
+                width: 50px;
+                height: 50px;
+                background: #29475D;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #F4C542;
+                font-size: 22px;
+                margin-bottom: 18px;
+            }}
+
+            .card h2 {{
+                font-size: 19px;
+                margin: 0 0 10px;
+            }}
+
+            .card p {{
+                color: #AFC1D2;
+                font-size: 14px;
+                line-height: 1.5;
+            }}
+
+            .logout {{
+                display: inline-block;
+                margin-top: 30px;
+                padding: 13px 25px;
+                background: #F4C542;
+                color: #06172D;
+                border-radius: 9px;
+                text-decoration: none;
+                font-weight: bold;
+            }}
+
+            .logout:hover {{
+                background: #FFD45C;
+            }}
+
+            @media (max-width: 800px) {{
+                .cards {{
+                    grid-template-columns: 1fr;
+                }}
+            }}
+
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+
+            <div class="header">
+
+                <div class="label">PATIENT PORTAL</div>
+
+                <h1>Welcome to MediTrack</h1>
+
+                <p>
+                    Manage your appointments and medical records from one place.
+                </p>
+
+            </div>
+
+            <div class="section-title">
+                NOTIFICATIONS
+            </div>
+
+            <div class="notification-card">
+
+                {notification_html}
+
+            </div>
+
+            <div class="section-title">
+                PATIENT ACCESS
+            </div>
+
+            <div class="cards">
+
+                <a href="/appointments" class="card">
+                    <div class="icon">▣</div>
+                    <h2>My Appointments</h2>
+                    <p>
+                        View your scheduled appointments.
+                    </p>
+                </a>
+
+                <a href="/consultations" class="card">
+                    <div class="icon">✚</div>
+                    <h2>Consultation History</h2>
+                    <p>
+                        View your previous consultations.
+                    </p>
+                </a>
+
+                <a href="/prescriptions" class="card">
+                    <div class="icon">▤</div>
+                    <h2>My Prescriptions</h2>
+                    <p>
+                        View your prescribed medicines.
+                    </p>
+                </a>
+
+            </div>
+
+            <a href="/logout" class="logout">
+                Logout
+            </a>
+
+        </div>
+
+    </body>
+    </html>
+    """
+@app.get("/doctor-dashboard", response_class=HTMLResponse)
+def doctor_dashboard(request: Request):
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "doctor":
+        return RedirectResponse("/login", status_code=303)
+    if request.session.get("role") != "doctor":
+        return RedirectResponse("/login", status_code=303)
+
+    return """
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+        <title>Doctor Dashboard - MediTrack</title>
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                font-family: Arial, sans-serif;
+                background: #06172D;
+                color: white;
+            }
+
+            .container {
+                max-width: 1100px;
+                margin: auto;
+                padding: 50px 30px;
+            }
+
+            .header {
+                background: #12385D;
+                padding: 40px;
+                border-radius: 18px;
+                margin-bottom: 30px;
+                border: 1px solid #315878;
+            }
+
+            .label {
+                color: #F4C542;
+                font-size: 13px;
+                font-weight: bold;
+                letter-spacing: 2px;
+            }
+
+            .header h1 {
+                font-size: 38px;
+                margin: 12px 0;
+            }
+
+            .header p {
+                color: #C4D2DF;
+                font-size: 16px;
+            }
+
+            .section-title {
+                margin: 30px 0 18px;
+                color: #F4C542;
+                font-size: 13px;
+                font-weight: bold;
+                letter-spacing: 2px;
+            }
+
+            .cards {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+
+            .card {
+                background: #102F50;
+                border: 1px solid #315878;
+                border-radius: 16px;
+                padding: 28px;
+                text-decoration: none;
+                color: white;
+                transition: 0.2s;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                border-color: #F4C542;
+            }
+
+            .icon {
+                width: 50px;
+                height: 50px;
+                background: #29475D;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #F4C542;
+                font-size: 22px;
+                margin-bottom: 18px;
+            }
+
+            .card h2 {
+                font-size: 19px;
+                margin: 0 0 10px;
+            }
+
+            .card p {
+                color: #AFC1D2;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .logout {
+                display: inline-block;
+                margin-top: 30px;
+                padding: 13px 25px;
+                background: #F4C542;
+                color: #06172D;
+                border-radius: 9px;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            @media (max-width: 800px) {
+                .cards {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+
+            <div class="header">
+
+                <div class="label">DOCTOR PORTAL</div>
+
+                <h1>Welcome to MediTrack</h1>
+
+                <p>
+                    Manage patients, appointments and medical records.
+                </p>
+
+            </div>
+
+            <div class="section-title">DOCTOR ACCESS</div>
+
+            <div class="cards">
+
+                <a href="/patients" class="card">
+                    <div class="icon">♟</div>
+                    <h2>View Patients</h2>
+                    <p>
+                        View registered patient information.
+                    </p>
+                </a>
+
+                <a href="/appointments" class="card">
+                    <div class="icon">▣</div>
+                    <h2>Appointments</h2>
+                    <p>
+                        View scheduled patient appointments.
+                    </p>
+                </a>
+
+                <a href="/consultation" class="card">
+                    <div class="icon">✚</div>
+                    <h2>Start Consultation</h2>
+                    <p>
+                        Record symptoms, diagnosis and treatment.
+                    </p>
+                </a>
+
+                <a href="/consultations" class="card">
+                <div class="icon">▤</div>
+                <h2>Consultation History</h2>
+                <p>
+                View previous consultation records.
+                </p>
+                </a>
+
+                <a href="/prescription" class="card">
+                    <div class="icon">▥</div>
+                    <h2>Generate Prescription</h2>
+                    <p>
+                        Create prescriptions for patients.
+                    </p>
+                </a>
+
+                <a href="/prescriptions" class="card">
+                    <div class="icon">▤</div>
+                    <h2>View Prescriptions</h2>
+                    <p>
+                        View generated prescriptions.
+                    </p>
+                </a>
+
+            </div>
+            <a href="/logout" class="logout">Logout</a>
+
+
+        </div>
+
+    </body>
+
+    </html>
+    """
+@app.get("/api/patients")
+def get_patients(request: Request):
+
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "doctor":
+        return {"error": "Unauthorized"}
+
+    db = SessionLocal()
+
+    patients = db.query(models.User).filter(
+        models.User.role == "patient"
+    ).all()
+
+    result = []
+
+    for patient in patients:
+        result.append({
+            "id": patient.id,
+            "username": patient.username,
+            "patient_id": patient.patient_id
+        })
+
+    db.close()
+
+    return result
+@app.post("/api/appointments")
+def create_appointment(
+    request: Request,
+    patient_id: str = Form(...),
+    doctor: str = Form(...),
+    date: str = Form(...),
+    time: str = Form(...)
+):
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "patient":
+        return {"error": "Unauthorized"}
+
+    db = SessionLocal()
+    existing = db.query(models.Appointment).filter(
+        models.Appointment.doctor == doctor,
+        models.Appointment.date == date,
+        models.Appointment.time == time
+    ).first()
+
+    if existing:
+        db.close()
+        return {
+            "error": "Slot already booked",
+            "message": "This doctor already has an appointment at the selected date and time."
+        }
+
+    appointment = models.Appointment(
+        patient_id=patient_id,
+        doctor=doctor,
+        date=date,
+        time=time
+    )
+
+    db.add(appointment)
+    db.commit()
+
+    notification = models.Notification(
+        patient_id=patient_id,
+        message=f"Your appointment with {doctor} is scheduled on {date} at {time}.",
+        notification_type="appointment"
+    )
+
+    db.add(notification)
+    db.commit()
+    create_audit_log(
+        db,
+        payload.get("username"),
+        "CREATE_APPOINTMENT",
+        f"Appointment with {doctor} on {date} at {time}"
+    )
+
+    db.close()
+
+    return {
+        "message": "Appointment created successfully",
+        "patient_id": patient_id,
+        "doctor": doctor,
+        "date": date,
+        "time": time
+    }
+@app.get("/api/appointments")
+def get_appointments(request: Request):
+
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload:
+        return {"error": "Unauthorized"}
+
+    db = SessionLocal()
+
+    appointments = db.query(models.Appointment).all()
+
+    result = []
+
+    for appointment in appointments:
+        result.append({
+            "id": appointment.id,
+            "patient_id": appointment.patient_id,
+            "doctor": appointment.doctor,
+            "date": appointment.date,
+            "time": appointment.time
+        })
+
+    db.close()
+
+    return result
+@app.put("/api/appointments/{appointment_id}")
+def update_appointment(
+    appointment_id: int,
+    request: Request,
+    doctor: str = Form(...),
+    date: str = Form(...),
+    time: str = Form(...)
+):
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "patient":
+        return {"error": "Unauthorized"}
+
+    db = SessionLocal()
+
+    appointment = db.query(models.Appointment).filter(
+        models.Appointment.id == appointment_id
+    ).first()
+
+    if not appointment:
+        db.close()
+        return {"error": "Appointment not found"}
+
+    existing = db.query(models.Appointment).filter(
+        models.Appointment.id != appointment_id,
+        models.Appointment.doctor == doctor,
+        models.Appointment.date == date,
+        models.Appointment.time == time
+    ).first()
+
+    if existing:
+        db.close()
+        return {
+            "error": "Slot already booked",
+            "message": "This doctor already has an appointment at the selected date and time."
+        }
+
+    appointment.doctor = doctor
+    appointment.date = date
+    appointment.time = time
+
+    db.commit()
+    create_audit_log(
+        db,
+        payload.get("username"),
+        "UPDATE_APPOINTMENT",
+        f"Appointment {appointment_id} updated to {doctor} on {date} at {time}"
+    )
+    db.close()
+
+    return {
+        "message": "Appointment updated successfully",
+        "appointment_id": appointment_id,
+        "doctor": doctor,
+        "date": date,
+        "time": time
+    }
+@app.delete("/api/appointments/{appointment_id}")
+def delete_appointment(
+    appointment_id: int,
+    request: Request
+):
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "patient":
+        return {"error": "Unauthorized"}
+
+    db = SessionLocal()
+
+    appointment = db.query(models.Appointment).filter(
+        models.Appointment.id == appointment_id
+    ).first()
+
+    if not appointment:
+        db.close()
+        return {"error": "Appointment not found"}
+
+    db.delete(appointment)
+    db.commit()
+    create_audit_log(
+        db,
+        payload.get("username"),
+        "DELETE_APPOINTMENT",
+        f"Appointment {appointment_id} deleted"
+    )
+    db.close()
+
+    return {
+        "message": "Appointment deleted successfully",
+        "appointment_id": appointment_id
+    }
+@app.get("/api/audit-logs")
+def get_audit_logs(request: Request):
+
+    token = request.session.get("access_token")
+    payload = verify_token(token) if token else None
+
+    if not payload or payload.get("role") != "doctor":
+        return {"error": "Unauthorized"}
+
+    db = SessionLocal()
+
+    logs = db.query(models.AuditLog).all()
+
+    result = []
+
+    for log in logs:
+        result.append({
+            "id": log.id,
+            "username": log.username,
+            "action": log.action,
+            "details": log.details
+        })
+
+    db.close()
+
+    return result
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse("/login", status_code=303)
+@app.get("/")
+def home(request: Request):
+    if "username" not in request.session:
+        return RedirectResponse("/login", status_code=303)
+
+    return RedirectResponse("/dashboard", status_code=303)
 
 @app.get("/register", response_class=HTMLResponse)
 def register(request: Request):
@@ -278,6 +1397,17 @@ def save_appointment(
     )
 
     db.add(appointment)
+    db.commit()
+
+    notification = models.Notification(
+    patient_id=patient_id,
+
+    message=f"Your appointment with {doctor} is scheduled on {date} at {time}.",
+
+    notification_type="appointment"
+    )
+
+    db.add(notification)
     db.commit()
     db.close()
 
@@ -813,14 +1943,27 @@ def save_consultation(
 """
 
 @app.get("/consultations", response_class=HTMLResponse)
-def view_consultations():
+def view_consultations(request: Request):
     db = SessionLocal()
 
-    consultation_list = db.query(models.Consultation).all()
+    if request.session.get("role") == "patient":
+        patient_id = request.session.get("patient_id")
+
+        consultation_list = db.query(models.Consultation).filter(
+            models.Consultation.patient_id == patient_id
+        ).all()
+
+    elif request.session.get("role") == "doctor":
+        consultation_list = db.query(models.Consultation).all()
+
+    else:
+        db.close()
+        return RedirectResponse("/login", status_code=303)
 
     db.close()
 
     if not consultation_list:
+
         return """
         <!DOCTYPE html>
         <html>
@@ -2026,6 +3169,12 @@ def view_prescriptions():
     """
 
     return html
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    if "username" not in request.session:
+        return RedirectResponse("/login", status_code=303)
+
+    return RedirectResponse("/dashboard", status_code=303)
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
