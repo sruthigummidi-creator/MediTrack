@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack | Healthcare Management</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #06172D;
+            color: white;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            height: 90px;
+            background: #06172D;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            border-bottom: 1px solid #315878;
+        }
+
+        .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: white;
+    min-width: 350px;
+}
+
+        .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: #F4C542;
+            color: #06172D;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .logo-text span {
+            color: #F4C542;
+        }
+
+        .logo-subtitle {
+            font-size: 15px;
+            margin-top: 2px;
+            color: #D7E1EE;
+        }
+
+        .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 32px 0 10px;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #F4C542;
+            border-bottom-color: #F4C542;
+        }
+
+        .phone {
+            color: white !important;
+            border: none !important;
+            white-space: nowrap;
+        }
+
+        .phone span {
+            color: #F4C542;
+            margin-right: 8px;
+        }
+
+        .login-btn {
+            background: #F4C542 !important;
+            color: #06172D !important;
+            padding: 14px 28px !important;
+            border-radius: 9px;
+            border: none !important;
+        }
+
+        .login-btn:hover {
+            background: #FFD95A !important;
+            border: none !important;
+        }
+
+        /* HERO */
+        .hero {
+            height: 100vh;
+            min-height: 650px;
+            padding-top: 90px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(6, 23, 45, 0.98) 0%,
+                    rgba(6, 23, 45, 0.92) 28%,
+                    rgba(6, 23, 45, 0.55) 55%,
+                    rgba(6, 23, 45, 0.25) 100%
+                ),
+                url("https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=2000&q=85");
+
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            width: 50%;
+            margin-left: 6%;
+            margin-top: -20px;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            line-height: 1.08;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 .yellow {
+            color: #F4C542;
+        }
+
+        .yellow-line {
+            width: 70px;
+            height: 4px;
+            background: #F4C542;
+            margin-bottom: 30px;
+        }
+
+        .hero p {
+            color: #F1F5FA;
+            font-size: 22px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        .get-started {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            background: #F4C542;
+            color: #06172D;
+            text-decoration: none;
+            font-size: 21px;
+            font-weight: bold;
+            padding: 18px 28px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .get-started:hover {
+            background: #FFD95A;
+            transform: translateY(-2px);
+        }
+
+        .arrow {
+            width: 32px;
+            height: 32px;
+            background: #06172D;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1100px) {
+            .logo {
+                min-width: auto;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .phone {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 50px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .navbar {
+                padding: 0 15px;
+            }
+
+            .logo-text {
+                font-size: 25px;
+            }
+
+            .logo-subtitle {
+                display: none;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+            }
+
+            .hero-content {
+                width: 85%;
+                margin-left: 8%;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <a href="/" class="logo">
+            <div class="logo-icon">✚</div>
+
+            <div>
+                <div class="logo-text">
+                    Medi<span>Track</span>
+                </div>
+
+                <div class="logo-subtitle">
+                    Healthcare Management System
+                </div>
+            </div>
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="/" class="active">Home</a>
+
+            <a href="/about">About Us</a>
+
+            <a href="/doctors">Doctors</a>
+
+            <a href="/contact">Contact</a>
+
+            <a href="tel:+919876543210" class="phone">
+                <span>☎</span> +91 98765 43210
+            </a>
+
+            <a href="/login" class="login-btn">
+                👤 Login
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- HERO -->
+    <main class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                Smart Healthcare,<br>
+                <span class="yellow">Better Patient Care.</span>
+            </h1>
+
+            <div class="yellow-line"></div>
+
+            <p>
+                MediTrack helps hospitals manage patients,
+                appointments, consultations and prescriptions
+                in one secure platform.
+            </p>
+
+            <a href="/login" class="get-started">
+                Get Started
+                <span class="arrow">→</span>
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
