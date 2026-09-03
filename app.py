@@ -1,3 +1,4 @@
+from django import db
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 import os
@@ -10,6 +11,12 @@ from database import engine, Base
 from database import SessionLocal
 import models
 from datetime import datetime
+import csv
+from io import StringIO
+from io import BytesIO
+from fastapi.responses import StreamingResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 SECRET_KEY = "meditrack-secret-key-2026"
 ALGORITHM = "HS256"
@@ -624,11 +631,60 @@ def patient_dashboard(request: Request):
                     grid-template-columns: 1fr;
                 }}
             }}
+                       .sidebar {{
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 250px;
+                height: 100vh;
+                background: #081F38;
+                padding: 30px 20px;
+                border-right: 1px solid #315878;
+                z-index: 10;
+            }}
+
+            .sidebar h2 {{
+                color: white;
+                margin-bottom: 30px;
+            }}
+
+            .sidebar a {{
+                display: block;
+                padding: 13px 15px;
+                margin-bottom: 8px;
+                color: #D7E1EE;
+                text-decoration: none;
+                border-radius: 8px;
+            }}
+
+            .sidebar a:hover {{
+                background: #F4C542;
+                color: #06172D;
+            }}
+
+            .container {{
+                margin-left: 250px;
+            }} 
 
         </style>
     </head>
 
     <body>
+            <aside class="sidebar">
+
+            <h2>✚ MediTrack</h2>
+
+            <a href="/patient-dashboard">⌂ Dashboard</a>
+
+            <a href="/appointments">▣ My Appointments</a>
+
+            <a href="/consultations">✚ Consultation History</a>
+
+            <a href="/prescriptions">▤ My Prescriptions</a>
+
+            <a href="/logout">Logout</a>
+
+        </aside>
 
         <div class="container">
 
@@ -825,10 +881,65 @@ def doctor_dashboard(request: Request):
                     grid-template-columns: 1fr;
                 }
             }
+                        .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 250px;
+                height: 100vh;
+                background: #081F38;
+                padding: 30px 20px;
+                border-right: 1px solid #315878;
+                z-index: 10;
+            }
+
+            .sidebar h2 {
+                color: white;
+                margin-bottom: 30px;
+            }
+
+            .sidebar a {
+                display: block;
+                padding: 13px 15px;
+                margin-bottom: 8px;
+                color: #D7E1EE;
+                text-decoration: none;
+                border-radius: 8px;
+            }
+
+            .sidebar a:hover {
+                background: #F4C542;
+                color: #06172D;
+            }
+
+            .container {
+                margin-left: 250px;
+            }
         </style>
     </head>
 
     <body>
+            <aside class="sidebar">
+
+            <h2>✚ MediTrack</h2>
+
+            <a href="/doctor-dashboard">⌂ Dashboard</a>
+
+            <a href="/patients">♙ View Patients</a>
+
+            <a href="/appointments">▣ Appointments</a>
+
+            <a href="/consultation">✚ Start Consultation</a>
+
+            <a href="/consultations">▤ Consultation History</a>
+
+            <a href="/prescription">▥ Generate Prescription</a>
+
+            <a href="/prescriptions">▤ View Prescriptions</a>
+
+            <a href="/logout">Logout</a>
+
+        </aside>
 
         <div class="container">
 
@@ -1028,13 +1139,23 @@ def update_appointment(
     request: Request,
     doctor: str = Form(...),
     date: str = Form(...),
-    time: str = Form(...)
+    time: str = Form(...),
+    status: str = Form(...)
 ):
     token = request.session.get("access_token")
     payload = verify_token(token) if token else None
 
     if not payload or payload.get("role") != "patient":
         return {"error": "Unauthorized"}
+
+    # Validate appointment status
+    allowed_statuses = ["Pending", "Completed", "Cancelled"]
+
+    if status not in allowed_statuses:
+        return {
+            "error": "Invalid status",
+            "message": "Status must be Pending, Completed, or Cancelled."
+        }
 
     db = SessionLocal()
 
@@ -1063,14 +1184,17 @@ def update_appointment(
     appointment.doctor = doctor
     appointment.date = date
     appointment.time = time
+    appointment.status = status
 
     db.commit()
+
     create_audit_log(
         db,
         payload.get("username"),
         "UPDATE_APPOINTMENT",
-        f"Appointment {appointment_id} updated to {doctor} on {date} at {time}"
+        f"Appointment {appointment_id} updated to {doctor} on {date} at {time} with status {status}"
     )
+
     db.close()
 
     return {
@@ -1078,7 +1202,8 @@ def update_appointment(
         "appointment_id": appointment_id,
         "doctor": doctor,
         "date": date,
-        "time": time
+        "time": time,
+        "status": status
     }
 @app.delete("/api/appointments/{appointment_id}")
 def delete_appointment(
@@ -1388,14 +1513,15 @@ def save_appointment(
                 "secondary_link": "/appointments"
             }
         )
-
     appointment = models.Appointment(
-        patient_id=patient_id,
-        doctor=doctor,
-        date=date,
-        time=time
-    )
+    patient_id=patient_id,
+    doctor=doctor,
+    date=date,
+    time=time,
+    status="Pending"
+)
 
+    
     db.add(appointment)
     db.commit()
 
@@ -3179,8 +3305,87 @@ def home(request: Request):
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
     db = SessionLocal()
+
+    # Basic analytics
     total_patients = db.query(models.Patient).count()
     total_appointments = db.query(models.Appointment).count()
+    total_consultations = db.query(models.Consultation).count()
+    total_prescriptions = db.query(models.Prescription).count()
+    # Patient age-group analytics
+
+    age_0_18 = db.query(models.Patient).filter(
+    models.Patient.age <= 18
+    ).count()
+
+    age_19_35 = db.query(models.Patient).filter(
+    models.Patient.age >= 19,
+    models.Patient.age <= 35
+    ).count()
+
+    age_36_50 = db.query(models.Patient).filter(
+    models.Patient.age >= 36,
+    models.Patient.age <= 50
+    ).count()
+
+    age_51_plus = db.query(models.Patient).filter(
+    models.Patient.age >= 51
+    ).count()
+    # Patient gender analytics
+
+    male_patients = db.query(models.Patient).filter(
+        models.Patient.gender == "Male"
+    ).count()
+
+    female_patients = db.query(models.Patient).filter(
+        models.Patient.gender == "Female"
+    ).count()
+
+    other_patients = db.query(models.Patient).filter(
+        models.Patient.gender == "Other"
+    ).count()
+    # Appointment status analytics
+    pending_appointments = db.query(models.Appointment).filter(
+        models.Appointment.status == "Pending"
+    ).count()
+
+    completed_appointments = db.query(models.Appointment).filter(
+        models.Appointment.status == "Completed"
+    ).count()
+
+    cancelled_appointments = db.query(models.Appointment).filter(
+        models.Appointment.status == "Cancelled"
+    ).count()
+        # Doctor consultation analytics
+    consultations = db.query(models.Consultation).all()
+
+    doctor_counts = {}
+
+    for consultation in consultations:
+        doctor = consultation.doctor
+
+        if doctor in doctor_counts:
+            doctor_counts[doctor] += 1
+        else:
+            doctor_counts[doctor] = 1
+
+    doctor_names = list(doctor_counts.keys())
+    consultation_counts = list(doctor_counts.values())
+        # Visit trends by day
+    appointments = db.query(models.Appointment).all()
+
+    visit_counts = {}
+
+    for appointment in appointments:
+        visit_date = appointment.date
+
+        if visit_date in visit_counts:
+            visit_counts[visit_date] += 1
+        else:
+            visit_counts[visit_date] = 1
+
+    visit_dates = list(visit_counts.keys())
+    visit_numbers = list(visit_counts.values())
+
     db.close()
 
     return templates.TemplateResponse(
@@ -3188,7 +3393,68 @@ def dashboard(request: Request):
         name="dashboard.html",
         context={
             "request": request,
+
             "total_patients": total_patients,
-            "total_appointments": total_appointments
+            "total_appointments": total_appointments,
+            "total_consultations": total_consultations,
+            "total_prescriptions": total_prescriptions,
+            
+
+            "pending_appointments": pending_appointments,
+            "completed_appointments": completed_appointments,
+            "cancelled_appointments": cancelled_appointments,
+            "age_0_18": age_0_18,
+            "age_19_35": age_19_35,
+            "age_36_50": age_36_50,
+            "age_51_plus": age_51_plus,
+            "male_patients": male_patients,
+            "female_patients": female_patients,
+            "other_patients": other_patients,
+            "doctor_names": doctor_names,
+            "consultation_counts": consultation_counts,
+            "visit_dates": visit_dates,
+            "visit_numbers": visit_numbers,
+            
+        }
+    )
+@app.get("/reports/appointments.csv")
+def export_appointments_csv():
+    db = SessionLocal()
+
+    appointments = db.query(models.Appointment).all()
+
+    output = StringIO()
+
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "ID",
+        "Patient ID",
+        "Doctor",
+        "Date",
+        "Time",
+        "Status"
+    ])
+
+    for appointment in appointments:
+        writer.writerow([
+            appointment.id,
+            appointment.patient_id,
+            appointment.doctor,
+            appointment.date,
+            appointment.time,
+            appointment.status
+        ])
+
+    db.close()
+
+    output.seek(0)
+
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition":
+            "attachment; filename=appointments_report.csv"
         }
     )

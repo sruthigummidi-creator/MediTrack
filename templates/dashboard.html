@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | MediTrack</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .dashboard-card {
+            background: #10243b;
+            border: 1px solid #243d59;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-card h3 {
+            margin: 0;
+            color: #d7e1ee;
+            font-size: 16px;
+        }
+
+        .dashboard-number {
+            margin-top: 12px;
+            color: #f5c542;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .analytics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .analytics-card {
+            background: #10243b;
+            border: 1px solid #243d59;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .analytics-card h2 {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .chart-box {
+            height: 300px;
+            position: relative;
+        }
+
+        @media (max-width: 1000px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analytics-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">✚</div>
+
+            <div>
+                <h2>MediTrack</h2>
+                <span>Healthcare System</span>
+            </div>
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="/dashboard" class="nav-item active">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <div class="nav-title">PATIENTS</div>
+
+            <a href="/register" class="nav-item">
+                <span>＋</span>
+                Register Patient
+            </a>
+
+            <a href="/patients" class="nav-item">
+                <span>♙</span>
+                View Patients
+            </a>
+
+            <a href="/search" class="nav-item">
+                <span>⌕</span>
+                Search Patient
+            </a>
+
+            <a href="/update" class="nav-item">
+                <span>✎</span>
+                Update Patient
+            </a>
+
+            <a href="/delete" class="nav-item danger-link">
+                <span>⌫</span>
+                Delete Patient
+            </a>
+
+            <div class="nav-title">APPOINTMENTS</div>
+
+            <a href="/book-appointment" class="nav-item">
+                <span>＋</span>
+                Book Appointment
+            </a>
+
+            <a href="/appointments" class="nav-item">
+                <span>▣</span>
+                View Appointments
+            </a>
+
+            <a href="/cancel-appointment" class="nav-item">
+                <span>×</span>
+                Cancel Appointment
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <p class="breadcrumb">Dashboard</p>
+                <h1>Dashboard</h1>
+            </div>
+
+            <div class="profile">
+
+                <div class="profile-avatar">M</div>
+
+                <div>
+                    <strong>MediTrack Admin</strong>
+                    <span>Administrator</span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE INTRO -->
+
+        <section class="page-intro">
+
+            <span class="section-label">ANALYTICS</span>
+
+            <h2>MediTrack Dashboard</h2>
+
+            <p>
+                Overview of patients, appointments, consultations and prescriptions.
+            </p>
+
+        </section>
+
+
+        <!-- DATABASE VALUES -->
+
+        <div id="dashboard-data"
+     data-patients="{{ total_patients }}"
+     data-appointments="{{ total_appointments }}"
+     data-consultations="{{ total_consultations }}"
+     data-prescriptions="{{ total_prescriptions }}"
+     data-pending="{{ pending_appointments }}"
+     data-completed="{{ completed_appointments }}"
+     data-cancelled="{{ cancelled_appointments }}"
+     data-age-0-18="{{ age_0_18 }}"
+     data-age-19-35="{{ age_19_35 }}"
+     data-age-36-50="{{ age_36_50 }}"
+     data-age-51-plus="{{ age_51_plus }}"
+     data-male="{{ male_patients }}"
+     data-female="{{ female_patients }}"
+     data-other="{{ other_patients }}"
+     data-doctor-names='{{ doctor_names | tojson }}'
+     data-consultation-counts='{{ consultation_counts | tojson }}'
+     data-visit-dates='{{ visit_dates | tojson }}'
+     data-visit-numbers='{{ visit_numbers | tojson }}'>
+</div>
+
+
+        <!-- SUMMARY CARDS -->
+
+        <section class="dashboard-cards">
+
+            <div class="dashboard-card">
+                <h3>Total Patients</h3>
+                <div class="dashboard-number">
+                    {{ total_patients }}
+                </div>
+            </div>
+
+
+            <div class="dashboard-card">
+                <h3>Total Appointments</h3>
+                <div class="dashboard-number">
+                    {{ total_appointments }}
+                </div>
+            </div>
+
+
+            <div class="dashboard-card">
+                <h3>Total Consultations</h3>
+                <div class="dashboard-number">
+                    {{ total_consultations }}
+                </div>
+            </div>
+
+
+            <div class="dashboard-card">
+                <h3>Total Prescriptions</h3>
+                <div class="dashboard-number">
+                    {{ total_prescriptions }}
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ANALYTICS -->
+
+        <section class="analytics-row">
+
+
+            <!-- PIE / DOUGHNUT -->
+
+            <div class="analytics-card">
+
+                <h2>System Statistics</h2>
+
+                <div class="chart-box">
+                    <canvas id="statisticsChart"></canvas>
+                </div>
+
+            </div>
+            <div class="analytics-card">
+
+    <h2>Patient Age Distribution</h2>
+
+    <div class="chart-box">
+        <canvas id="ageChart"></canvas>
+    </div>
+
+</div>
+<!-- GENDER DISTRIBUTION -->
+
+<div class="analytics-card">
+
+    <h2>Gender Distribution</h2>
+
+    <div class="chart-box">
+        <canvas id="genderChart"></canvas>
+    </div>
+
+</div>
+<div class="analytics-card">
+    <h2>Doctor Consultation Analytics</h2>
+
+    <div class="chart-box">
+        <canvas id="doctorChart"></canvas>
+    </div>
+</div>
+<div class="analytics-card">
+    <h2>Visit Trends by Day</h2>
+
+    <div class="chart-box">
+        <canvas id="visitChart"></canvas>
+    </div>
+</div>
+
+
+            <!-- BAR CHART -->
+
+            <div class="analytics-card">
+
+    <h2>Appointments by Status</h2>
+
+    <div class="chart-box">
+        <canvas id="overviewChart"></canvas>
+    </div>
+
+</div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+
+        <footer class="main-footer">
+
+            <p>
+                © 2026 MediTrack · Healthcare Management System
+            </p>
+
+            <p>
+                Patient care made simpler.
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        const dashboardData =
+            document.getElementById("dashboard-data");
+
+
+        const totalPatients =
+            Number(dashboardData.dataset.patients);
+        const doctorNames =
+            JSON.parse(dashboardData.dataset.doctorNames);
+
+        const consultationCounts =
+            JSON.parse(dashboardData.dataset.consultationCounts);
+        const visitDates =
+            JSON.parse(dashboardData.dataset.visitDates);
+
+        const visitNumbers =
+            JSON.parse(dashboardData.dataset.visitNumbers);
+
+
+        const totalAppointments =
+            Number(dashboardData.dataset.appointments);
+
+
+        const totalConsultations =
+            Number(dashboardData.dataset.consultations);
+
+
+        const totalPrescriptions =
+            Number(dashboardData.dataset.prescriptions);
+
+        const pendingAppointments =
+            Number(dashboardData.dataset.pending);
+
+        const completedAppointments =
+            Number(dashboardData.dataset.completed);
+
+        const cancelledAppointments =
+            Number(dashboardData.dataset.cancelled);
+        const age0_18 =
+            Number(dashboardData.dataset["age-0-18"]);
+
+        const age19_35 =
+            Number(dashboardData.dataset["age-19-35"]);
+
+        const age36_50 =
+            Number(dashboardData.dataset["age-36-50"]);
+
+        const age51Plus =
+            Number(dashboardData.dataset["age-51-plus"]);
+        const malePatients =
+            Number(dashboardData.dataset.male);
+
+        const femalePatients =
+            Number(dashboardData.dataset.female);
+
+        const otherPatients =
+            Number(dashboardData.dataset.other);
+       
+
+
+        /* DOUGHNUT CHART */
+
+        new Chart(
+            document.getElementById("statisticsChart"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: [
+                        "Patients",
+                        "Appointments",
+                        "Consultations",
+                        "Prescriptions"
+                    ],
+
+                    datasets: [
+                        {
+                            data: [
+                                totalPatients,
+                                totalAppointments,
+                                totalConsultations,
+                                totalPrescriptions
+                            ],
+
+                            backgroundColor: [
+                                "#2196F3",
+                                "#2ECC71",
+                                "#9B59B6",
+                                "#F5C542"
+                            ],
+
+                            borderWidth: 2,
+
+                            borderColor: "#10243b"
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: "right",
+
+                            labels: {
+                                color: "#ffffff"
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+
+        /* BAR CHART */
+
+        /* APPOINTMENT STATUS CHART */
+
+new Chart(
+    document.getElementById("overviewChart"),
+    {
+        type: "doughnut",
+
+        data: {
+            labels: [
+                "Completed",
+                "Pending",
+                "Cancelled"
+            ],
+
+            datasets: [
+                {
+                    data: [
+                        completedAppointments,
+                        pendingAppointments,
+                        cancelledAppointments
+                    ],
+
+                    backgroundColor: [
+                        "#2ECC71",
+                        "#F5C542",
+                        "#E74C3C"
+                    ],
+
+                    borderWidth: 2,
+
+                    borderColor: "#10243b"
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: "right",
+
+                    labels: {
+                        color: "#ffffff",
+                        padding: 15
+                    }
+                }
+            }
+        }
+    }
+);
+/* PATIENT AGE DISTRIBUTION */
+
+new Chart(
+    document.getElementById("ageChart"),
+    {
+        type: "bar",
+
+        data: {
+            labels: [
+                "0–18",
+                "19–35",
+                "36–50",
+                "51+"
+            ],
+
+            datasets: [
+                {
+                    label: "Patients",
+
+                    data: [
+                        age0_18,
+                        age19_35,
+                        age36_50,
+                        age51Plus
+                    ],
+
+                    backgroundColor: "#F5C542",
+
+                    borderRadius: 8
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#ffffff"
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+
+                    ticks: {
+                        color: "#ffffff"
+                    }
+                }
+            },
+
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ffffff"
+                    }
+                }
+            }
+        }
+    }
+);
+/* GENDER DISTRIBUTION */
+
+new Chart(
+    document.getElementById("genderChart"),
+    {
+        type: "doughnut",
+
+        data: {
+            labels: [
+                "Male",
+                "Female",
+                "Other"
+            ],
+
+            datasets: [
+                {
+                    data: [
+                        malePatients,
+                        femalePatients,
+                        otherPatients
+                    ],
+
+                    backgroundColor: [
+                        "#2196F3",
+                        "#E91E63",
+                        "#9B59B6"
+                    ],
+
+                    borderWidth: 2,
+
+                    borderColor: "#10243b"
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: "right",
+
+                    labels: {
+                        color: "#ffffff",
+                        padding: 15
+                    }
+                }
+            }
+        }
+    }
+);
+/* DOCTOR CONSULTATION ANALYTICS */
+
+new Chart(
+    document.getElementById("doctorChart"),
+    {
+        type: "bar",
+
+        data: {
+            labels: doctorNames,
+
+            datasets: [
+                {
+                    label: "Consultations",
+                    data: consultationCounts,
+                    borderWidth: 1
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ffffff"
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#ffffff"
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#ffffff",
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    }
+);
+/* VISIT TRENDS BY DAY */
+
+new Chart(
+    document.getElementById("visitChart"),
+    {
+        type: "line",
+
+        data: {
+            labels: visitDates,
+
+            datasets: [
+                {
+                    label: "Visits",
+                    data: visitNumbers,
+                    borderWidth: 2,
+                    tension: 0.3
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ffffff"
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#ffffff"
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#ffffff",
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    }
+);
+    </script>
+
+</body>
+</html>

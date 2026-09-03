@@ -18,8 +18,9 @@ class Appointment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(String)
-    doctor = Column(String)
-    date = Column(String)
+    doctor = Column(String, index=True)
+    date = Column(String, index=True)
+    status = Column(String, default="Pending", index=True)
     time = Column(String)
 class Notification(Base):
     __tablename__ = "notifications"
@@ -33,7 +34,7 @@ class Consultation(Base):
     __tablename__ = "consultations"
 
     id = Column(Integer, primary_key=True, index=True)
-    patient_id = Column(String, nullable=False)
+    patient_id = Column(String, nullable=False, index=True)
     doctor = Column(String, nullable=False)
     symptoms = Column(String, nullable=False)
     diagnosis = Column(String, nullable=False)
