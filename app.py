@@ -235,6 +235,13 @@ def login_page():
             </div>
 
             <button type="submit">Login</button>
+            <div style="text-align:center; margin-top:20px; color:#AFC1D2;">
+    Don't have an account?
+    <a href="/register-account"
+       style="color:#F4C542; text-decoration:none; font-weight:bold;">
+        Create Account
+    </a>
+</div>
 
         </form>
 
@@ -416,6 +423,252 @@ def login(
         return RedirectResponse("/doctor-dashboard", status_code=303)
 
     return RedirectResponse("/dashboard", status_code=303)
+@app.get("/register-account", response_class=HTMLResponse)
+def register_account_page():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Create Account | MediTrack</title>
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                font-family: Arial, sans-serif;
+                background: #06172D;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .register-container {
+                width: 100%;
+                max-width: 430px;
+                background: #102F50;
+                border: 1px solid #315878;
+                border-radius: 18px;
+                padding: 40px;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            }
+
+            .logo {
+                width: 55px;
+                height: 55px;
+                border-radius: 14px;
+                background: #F4C542;
+                color: #06172D;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+                font-weight: bold;
+                margin-bottom: 25px;
+            }
+
+            .label {
+                color: #F4C542;
+                font-size: 12px;
+                font-weight: bold;
+                letter-spacing: 2px;
+                margin-bottom: 10px;
+            }
+
+            h1 {
+                margin: 0 0 8px;
+                font-size: 30px;
+            }
+
+            .subtitle {
+                color: #AFC1D2;
+                margin-bottom: 30px;
+                font-size: 14px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                color: #DDE7F1;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            input,
+            select {
+                width: 100%;
+                padding: 13px;
+                border-radius: 8px;
+                border: 1px solid #315878;
+                background: #081D35;
+                color: white;
+                font-size: 14px;
+                outline: none;
+            }
+
+            input:focus,
+            select:focus {
+                border-color: #F4C542;
+            }
+
+            select option {
+                background: #081D35;
+                color: white;
+            }
+
+            button {
+                width: 100%;
+                padding: 14px;
+                margin-top: 10px;
+                border: none;
+                border-radius: 9px;
+                background: #F4C542;
+                color: #06172D;
+                font-size: 15px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            button:hover {
+                opacity: 0.9;
+            }
+
+            .login-link {
+                text-align: center;
+                margin-top: 20px;
+                color: #AFC1D2;
+                font-size: 14px;
+            }
+
+            .login-link a {
+                color: #F4C542;
+                text-decoration: none;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="register-container">
+
+            <div class="logo">+</div>
+
+            <div class="label">MEDITRACK</div>
+
+            <h1>Create Account</h1>
+
+            <p class="subtitle">
+                Create your healthcare portal account.
+            </p>
+
+            <form action="/register-account" method="post">
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Enter username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter password"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+
+                    <select name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="patient">Patient</option>
+                        <option value="doctor">Doctor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Patient ID (for Patient only)</label>
+
+                    <input
+                        type="text"
+                        name="patient_id"
+                        placeholder="Example: PAT101"
+                    >
+                </div>
+
+                <button type="submit">
+                    Create Account
+                </button>
+
+            </form>
+
+            <div class="login-link">
+                Already have an account?
+                <a href="/login">Login</a>
+            </div>
+
+        </div>
+
+    </body>
+    </html>
+    """
+@app.post("/register-account", response_class=HTMLResponse)
+def register_account(
+    username: str = Form(...),
+    password: str = Form(...),
+    role: str = Form(...),
+    patient_id: str = Form("")
+):
+    db = SessionLocal()
+
+    existing_user = db.query(models.User).filter(
+        models.User.username == username
+    ).first()
+
+    if existing_user:
+        db.close()
+
+        return HTMLResponse("""
+        <h2 style="text-align:center; margin-top:100px;">
+            Username already exists.
+        </h2>
+
+        <p style="text-align:center;">
+            <a href="/register-account">Try Again</a>
+        </p>
+        """)
+
+    new_user = models.User(
+        username=username,
+        password=password,
+        role=role,
+        patient_id=patient_id if patient_id else None
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.close()
+
+    return RedirectResponse(
+        "/login",
+        status_code=303
+    )
 @app.get("/patient-dashboard", response_class=HTMLResponse)
 def patient_dashboard(request: Request):
     token = request.session.get("access_token")
