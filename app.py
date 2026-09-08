@@ -1270,12 +1270,34 @@ def get_audit_logs(request: Request):
 def logout(request: Request):
     request.session.clear()
     return RedirectResponse("/login", status_code=303)
-@app.get("/")
+@app.get("/about", response_class=HTMLResponse)
+def about(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="about.html",
+        context={}
+    )
+@app.get("/doctors", response_class=HTMLResponse)
+def doctors(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="doctors.html",
+        context={}
+    )
+@app.get("/contact", response_class=HTMLResponse)
+def contact(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="contact.html",
+        context={}
+    )
+@app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    if "username" not in request.session:
-        return RedirectResponse("/login", status_code=303)
-
-    return RedirectResponse("/dashboard", status_code=303)
+    return templates.TemplateResponse(
+        request=request,
+        name="landing.html",
+        context={}
+    )
 
 @app.get("/register", response_class=HTMLResponse)
 def register(request: Request):
